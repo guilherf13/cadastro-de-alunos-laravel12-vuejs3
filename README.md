@@ -114,10 +114,10 @@ docker-compose exec app php artisan key:generate
 
 **3. Executar as Migrations e Seeders:**
 
-Este comando irá criar a estrutura do banco de dados e popular a tabela de usuários com um perfil de "Gestor" e um de "Funcionário".
+Este comando irá criar a estrutura do banco de dados e popular as tabelas com usuários de teste (Gestor/Funcionário) e 15 alunos fakes.
 
 ```bash
-docker-compose exec app php artisan migrate:fresh --seed --seeder=UserSeeder
+docker-compose exec app php artisan migrate:fresh --seed
 ```
 
 ---
@@ -137,6 +137,14 @@ A tela de login pode ser acessada em: 👉 **[http://localhost:5173/login](http:
 -   **Senha:** `password`
 
 ---
+
+## 🧪 Executando os Testes
+
+Para rodar a suíte de testes automatizados do backend (Pest), execute o seguinte comando:
+
+```bash
+docker-compose exec app php artisan test
+```
 
 ## Utilização
 
