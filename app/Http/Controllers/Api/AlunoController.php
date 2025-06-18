@@ -29,18 +29,18 @@ class AlunoController extends Controller
     public function store(StoreAlunoRequest $request): AlunoResource
     {
         $aluno = $this->alunoService->create($request->user(), $request->validated());
-        return new AlunoResource($aluno);
+        return AlunoResource::make($aluno);
     }
 
     public function show(Aluno $aluno): AlunoResource
     {
-        return new AlunoResource($aluno);
+        return AlunoResource::make($aluno);
     }
 
     public function update(UpdateAlunoRequest $request, Aluno $aluno): AlunoResource
     {
         $this->alunoService->update($request->user(), $aluno, $request->validated());
-        return new AlunoResource($aluno->fresh());
+        return AlunoResource::make($aluno->fresh());
     }
 
     public function destroy(Request $request, Aluno $aluno): Response
