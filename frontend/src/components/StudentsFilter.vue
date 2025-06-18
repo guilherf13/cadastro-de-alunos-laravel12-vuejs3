@@ -26,8 +26,9 @@
         @change="updateFilters"
       >
         <option value="all">Todos</option>
-        <option value="ativo">Ativo</option>
-        <option value="inativo">Inativo</option>
+        <option value="Pendente">Pendente</option>
+        <option value="Aprovado">Aprovado</option>
+        <option value="Cancelado">Cancelado</option>
       </BaseSelect>
 
       <BaseSelect

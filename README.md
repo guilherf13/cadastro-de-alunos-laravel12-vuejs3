@@ -25,8 +25,8 @@ Siga os passos abaixo para configurar e executar o ambiente de desenvolvimento l
 Primeiro, clone este repositório para a sua máquina local:
 
 ```bash
-git clone [https://github.com/seu-usuario/seu-repositorio.git](https://github.com/seu-usuario/seu-repositorio.git)
-cd seu-repositorio
+git clone https://github.com/guilherf13/teste-tecnico-alunos.git
+cd teste_tecnico
 ```
 
 ### Passo 2: Configurar Variáveis de Ambiente e Permissões

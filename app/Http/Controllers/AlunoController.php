@@ -11,7 +11,6 @@ use App\Services\AlunoService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Support\Facades\Log;
 
 class AlunoController extends Controller
 {
@@ -35,22 +34,12 @@ class AlunoController extends Controller
     {
         try {
             $aluno = $this->alunoService->create($request->user(), $request->validated());
-            Log::info('Aluno criado com sucesso.', ['aluno_id' => $aluno->id, 'criado_por' => $request->user()->id]);
             return (new AlunoResource($aluno))
                     ->response()
                     ->setStatusCode(Response::HTTP_CREATED);
         } catch (AuthorizationException $e) {
-            Log::warning('Tentativa de criação de aluno não autorizada.', [
-                'user_id' => $request->user()->id, 
-                'error' => $e->getMessage()
-            ]);
             return response()->json(['message' => $e->getMessage()], Response::HTTP_FORBIDDEN);
         } catch (\Exception $e) {
-            Log::error('Erro ao criar aluno.', [
-                'user_id' => $request->user()->id,
-                'data' => $request->validated(),
-                'error' => $e->getMessage()
-            ]);
             return response()->json(['message' => 'Ocorreu um erro interno ao criar o aluno.'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
