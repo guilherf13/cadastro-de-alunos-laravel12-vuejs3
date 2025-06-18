@@ -32,7 +32,6 @@ class AlunoService
         if ($user->perfil !== 'Gestor' && $user->perfil !== 'Funcionario') {
             throw new AuthorizationException('Você não tem permissão para criar alunos.');
         }
-        unset($data['id']); // Garante que o id não será sobrescrito
         return Aluno::create($data);
     }
 
@@ -41,7 +40,6 @@ class AlunoService
         if ($user->perfil !== 'Gestor' && $user->perfil !== 'Funcionario') {
             throw new AuthorizationException('Você não tem permissão para editar alunos.');
         }
-        unset($data['id']); // Garante que o id não será sobrescrito
         return $aluno->update($data);
     }
 

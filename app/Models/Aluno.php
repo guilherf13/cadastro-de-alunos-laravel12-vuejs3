@@ -3,13 +3,14 @@
 namespace App\Models;
 
 use App\Enums\StatusAluno;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Aluno extends Model
 {
-    use HasFactory, HasUuids;
+    use HasFactory;
+
+    public $incrementing = true;
 
     /**
      * The attributes that are mass assignable.
@@ -18,10 +19,13 @@ class Aluno extends Model
      */
     protected $fillable = [
         'nome',
+        'email',
         'cpf',
         'data_nascimento',
         'turma',
         'status',
+        'telefone',
+        'curso',
     ];
 
     /**
@@ -30,8 +34,7 @@ class Aluno extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'data_nascimento' => 'date',
+        'data_nascimento' => 'datetime:Y-m-d',
         'status' => StatusAluno::class, // Usando o Enum para o campo status
-        'id' => 'integer',
     ];
 }

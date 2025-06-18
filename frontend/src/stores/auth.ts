@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { apiService } from '@/services/api';
+import { login, setAuthHeader, removeAuthHeader } from '@/services/api';
 import type { User } from '@/types';
 
 interface AuthState {
@@ -18,7 +18,7 @@ export const useAuthStore = defineStore('auth', {
   },
   actions: {
     async login(credentials: { email: string; password: string }) {
-      const response = await apiService.login(credentials);
+      const response = await login(credentials);
       const { access_token, user } = response.data;
       
       this.token = access_token;
@@ -27,18 +27,18 @@ export const useAuthStore = defineStore('auth', {
       localStorage.setItem('token', access_token);
       localStorage.setItem('user', JSON.stringify(user));
 
-      apiService.setAuthHeader(access_token);
+      setAuthHeader(access_token);
     },
     logout() {
       this.token = null;
       this.user = null;
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      apiService.removeAuthHeader();
+      removeAuthHeader();
     },
     initializeAuth() {
         if (this.token) {
-            apiService.setAuthHeader(this.token);
+            setAuthHeader(this.token);
         }
     }
   },

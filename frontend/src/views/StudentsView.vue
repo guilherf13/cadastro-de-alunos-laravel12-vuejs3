@@ -95,7 +95,6 @@
             @delete="confirmDelete(student)"
             @toggle-status="toggleStudentStatus(student)"
           />
-          <span style="color:red; font-size:12px;">ID: {{ student.id }} ({{ typeof student.id }})</span>
         </div>
       </div>
 
@@ -175,20 +174,14 @@ async function fetchStudents() {
 }
 
 function editStudent(student: Student) {
-  console.log('Tentando editar. Objeto student:', student);
-  console.log('ID recebido:', student.id, 'Tipo:', typeof student.id);
-
   if (!student || student.id === undefined || student.id === null) {
-    console.error('Objeto do aluno ou ID está ausente.', student);
     notificationsStore.error('Erro de Dados', 'Não foi possível obter o ID do aluno para edição.');
     return;
   }
   
   const studentId = Number(student.id);
-  console.log('ID convertido para número:', studentId);
 
   if (isNaN(studentId) || studentId <= 0) {
-    console.error('ID do aluno não é um número válido:', student.id);
     notificationsStore.error('ID de Aluno Inválido', `O ID "${student.id}" é inválido.`);
     return;
   }

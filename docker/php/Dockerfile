@@ -10,7 +10,7 @@ ARG GID=1000
 # Define o diretório de trabalho dentro do contêiner
 WORKDIR /var/www
 
-# Instalação de dependências do sistema e extensões PHP necessárias para o Laravel
+# Instalação de dependências do sistema e extensões PHP
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -23,32 +23,35 @@ RUN apt-get update && apt-get install -y \
     libjpeg-dev \
     libfreetype6-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install \
-    pdo_mysql \
-    mbstring \
-    exif \
-    pcntl \
-    bcmath \
-    gd \
-    zip
+    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
 
 # Limpa o cache do apt para reduzir o tamanho da imagem
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# ---- Modificação do Usuário e Grupo ----
-# Altera o UID e GID do usuário www-data para corresponder ao usuário do host.
-# Isso evita problemas de permissão de arquivos com volumes montados.
+# Configura o Git para ignorar problemas de ownership no diretório de trabalho
+RUN git config --global --add safe.directory /var/www
+
+# Instala o Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Copia os arquivos de dependência e instala.
+# Isso irá gerar um composer.lock dentro do contêiner baseado no PHP 8.4
+COPY composer.json ./
+RUN composer install --no-interaction --no-plugins --no-scripts --prefer-dist
+
+# Copia o restante do código da aplicação
+COPY . .
+
+# Otimiza o autoloader
+RUN composer install --no-interaction --optimize-autoloader
+
+# Ajusta as permissões dos arquivos e do usuário
 RUN groupmod -g ${GID} www-data && \
     usermod -u ${UID} -g www-data www-data && \
     chown -R www-data:www-data /var/www
 
-# Instala o Composer (gerenciador de dependências do PHP)
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-
-# Define o usuário do contêiner para ser o www-data (agora com o UID/GID corretos)
+# Muda para o usuário não-root
 USER www-data
-
-COPY . .
 
 # Expõe a porta 9000 para o serviço PHP-FPM
 EXPOSE 9000

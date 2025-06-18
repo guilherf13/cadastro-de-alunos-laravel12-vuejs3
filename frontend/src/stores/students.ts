@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import { apiService } from '@/services/api';
+import { createStudent, getStudents, updateStudent, deleteStudent, updateStudentStatus, getStudent } from '@/services/api';
 import type { Student, FilterOptions } from '@/types';
 
 export const useStudentsStore = defineStore('students', () => {
@@ -46,13 +46,20 @@ export const useStudentsStore = defineStore('students', () => {
     loading.value = true;
     error.value = null;
     try {
-      const fetchedStudents = await apiService.getStudents();
-      console.log('Alunos recebidos da API:', fetchedStudents);
+      const fetchedStudents = await getStudents();
       students.value = fetchedStudents.map(student => ({
-        ...student,
-        id: Number(student.id)
+        id: Number(student.id),
+        nome: student.nome,
+        email: student.email,
+        cpf: student.cpf,
+        data_nascimento: student.data_nascimento,
+        turma: student.turma,
+        telefone: student.telefone,
+        curso: student.curso,
+        status: student.status,
+        created_at: student.created_at,
+        updated_at: student.updated_at,
       }));
-      console.log('Alunos após conversão de ID:', students.value);
     } catch (err: any) {
       error.value = err.response?.data?.message || 'Erro ao carregar alunos';
       console.error('Erro ao buscar alunos:', err);
@@ -61,11 +68,11 @@ export const useStudentsStore = defineStore('students', () => {
     }
   }
 
-  async function createStudent(studentData: Omit<Student, 'id' | 'created_at' | 'updated_at'>) {
+  async function createStudentAction(studentData: Omit<Student, 'id' | 'created_at' | 'updated_at'>) {
     loading.value = true;
     error.value = null;
     try {
-      const newStudent = await apiService.createStudent(studentData);
+      const newStudent = await createStudent(studentData);
       // Garante que o ID seja um número
       newStudent.id = Number(newStudent.id);
       students.value.push(newStudent);
@@ -78,11 +85,11 @@ export const useStudentsStore = defineStore('students', () => {
     }
   }
 
-  async function updateStudent(id: number, studentData: Partial<Student>) {
+  async function updateStudentAction(id: number, studentData: Partial<Student>) {
     loading.value = true;
     error.value = null;
     try {
-      const updatedStudent = await apiService.updateStudent(id, studentData);
+      const updatedStudent = await updateStudent(id, studentData);
       // Garante que o ID seja um número
       updatedStudent.id = Number(updatedStudent.id);
       const index = students.value.findIndex(s => s.id === id);
@@ -98,11 +105,11 @@ export const useStudentsStore = defineStore('students', () => {
     }
   }
 
-  async function deleteStudent(id: number) {
+  async function deleteStudentAction(id: number) {
     loading.value = true;
     error.value = null;
     try {
-      await apiService.deleteStudent(id);
+      await deleteStudent(id);
       students.value = students.value.filter(s => s.id !== id);
     } catch (err: any) {
       error.value = err.response?.data?.message || 'Erro ao deletar aluno';
@@ -112,9 +119,9 @@ export const useStudentsStore = defineStore('students', () => {
     }
   }
 
-  async function updateStudentStatus(id: number, status: 'Pendente' | 'Aprovado' | 'Cancelado') {
+  async function updateStudentStatusAction(id: number, status: 'Pendente' | 'Aprovado' | 'Cancelado') {
     try {
-      const updatedStudent = await apiService.updateStudentStatus(id, status);
+      const updatedStudent = await updateStudentStatus(id, status);
       // Garante que o ID seja um número
       updatedStudent.id = Number(updatedStudent.id);
       const index = students.value.findIndex(s => s.id === id);
@@ -124,6 +131,22 @@ export const useStudentsStore = defineStore('students', () => {
       return updatedStudent;
     } catch (err: any) {
       error.value = err.response?.data?.message || 'Erro ao atualizar status';
+      throw err;
+    }
+  }
+
+  async function fetchStudentById(id: number): Promise<Student | undefined> {
+    const existingStudent = students.value.find(s => s.id === id);
+    if (existingStudent) {
+      return existingStudent;
+    }
+
+    try {
+      const student = await getStudent(id);
+      students.value.push(student); // Adiciona ao 'cache' do store
+      return student;
+    } catch (err) {
+      error.value = `Erro ao buscar aluno com ID ${id}`;
       throw err;
     }
   }
@@ -154,10 +177,11 @@ export const useStudentsStore = defineStore('students', () => {
     availableCourses,
     // Actions
     fetchStudents,
-    createStudent,
-    updateStudent,
-    deleteStudent,
-    updateStudentStatus,
+    fetchStudentById,
+    createStudent: createStudentAction,
+    updateStudent: updateStudentAction,
+    deleteStudent: deleteStudentAction,
+    updateStudentStatus: updateStudentStatusAction,
     setFilters,
     clearFilters
   };

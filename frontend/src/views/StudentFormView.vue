@@ -149,7 +149,7 @@ import { ArrowLeftIcon } from '@heroicons/vue/24/outline';
 
 import { useStudentsStore } from '@/stores/students';
 import { useNotificationsStore } from '@/stores/notifications';
-import { apiService } from '@/services/api';
+import apiService from '@/services/api';
 import { useAuthStore } from '@/stores/auth';
 
 import BaseButton from '@/components/BaseButton.vue';
@@ -249,78 +249,49 @@ function validateForm() {
   return Object.values(errors).every(error => !error);
 }
 
-// Métodos de CRUD
-async function loadStudent() {
-  if (!isEditing.value) return;
-
-  loadingStudent.value = true;
-  try {
-    const student = await apiService.getStudent(Number(studentId.value));
-    Object.assign(form, {
-      nome: student.nome,
-      cpf: student.cpf,
-      data_nascimento: student.data_nascimento,
-      turma: student.turma,
-      email: student.email,
-      telefone: student.telefone,
-      curso: student.curso,
-      status: student.status
-    });
-  } catch (error: any) {
-    notificationsStore.error(
-      'Erro ao carregar aluno',
-      error.response?.data?.message || 'Aluno não encontrado'
-    );
-    router.push('/');
-  } finally {
-    loadingStudent.value = false;
-  }
-}
-
+// Método de envio
 async function handleSubmit() {
-  if (!validateForm()) return;
-
+  if (!validateForm()) {
+    notificationsStore.showNotification('Por favor, corrija os erros no formulário.', 'error');
+    return;
+  }
+  
   loading.value = true;
   try {
-    if (isEditing.value) {
-      await studentsStore.updateStudent(Number(studentId.value), form);
-      notificationsStore.success(
-        'Aluno atualizado com sucesso',
-        `${form.nome} foi atualizado no sistema`
-      );
-    } else {
-      await studentsStore.createStudent(form);
-      notificationsStore.success(
-        'Aluno criado com sucesso',
-        `${form.nome} foi adicionado ao sistema`
-      );
-    }
+    const studentData: Omit<Student, 'id' | 'created_at' | 'updated_at'> = { ...form };
     
+    if (isEditing.value) {
+      await studentsStore.updateStudent(studentId.value, studentData);
+      notificationsStore.success('Aluno atualizado com sucesso!');
+    } else {
+      await studentsStore.createStudent(studentData);
+      notificationsStore.success('Aluno criado com sucesso!');
+    }
     router.push('/');
   } catch (error: any) {
-    const message = error.response?.data?.message || 
-                   (isEditing.value ? 'Erro ao atualizar aluno' : 'Erro ao criar aluno');
-    
-    notificationsStore.error(
-      isEditing.value ? 'Erro ao atualizar' : 'Erro ao criar',
-      message
-    );
+    const message = error.response?.data?.message || 'Ocorreu um erro.';
+    notificationsStore.error('Erro na Operação', message);
   } finally {
     loading.value = false;
   }
 }
 
-// Lifecycle
+// Carregar dados do aluno ao montar
 onMounted(async () => {
   if (isEditing.value && studentId.value) {
     loadingStudent.value = true;
     try {
-      const student = await apiService.getStudent(studentId.value);
-      Object.assign(form, student);
+      const student = await studentsStore.fetchStudentById(studentId.value);
+      if (student) {
+        Object.assign(form, {
+          ...student,
+          data_nascimento: student.data_nascimento.split('T')[0]
+        });
+      }
     } catch (err: any) {
       notificationsStore.error(
         'Erro ao carregar aluno',
-        err.response?.data?.message || 'Não foi possível buscar os dados do aluno.'
+        err.message || 'Não foi possível buscar os dados do aluno.'
       );
       router.push('/');
     } finally {
