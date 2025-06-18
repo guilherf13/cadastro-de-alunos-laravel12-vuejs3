@@ -26,7 +26,7 @@ Primeiro, clone este repositório para a sua máquina local:
 
 ```bash
 git clone https://github.com/guilherf13/teste-tecnico-alunos.git
-cd teste_tecnico
+cd teste-tecnico-alunos
 ```
 
 ### Passo 2: Configurar Variáveis de Ambiente e Permissões
