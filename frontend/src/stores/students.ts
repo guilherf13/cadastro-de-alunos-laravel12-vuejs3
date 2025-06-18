@@ -33,8 +33,8 @@ export const useStudentsStore = defineStore('students', () => {
   });
 
   const totalStudents = computed(() => students.value.length);
-  const activeStudents = computed(() => students.value.filter(s => s.status === 'Aprovado').length);
-  const inactiveStudents = computed(() => students.value.filter(s => s.status === 'Cancelado').length);
+  const approvedStudents = computed(() => students.value.filter(s => s.status === 'Aprovado').length);
+  const cancelledStudents = computed(() => students.value.filter(s => s.status === 'Cancelado').length);
 
   const availableCourses = computed(() => {
     const courses = students.value.map(s => s.curso);
@@ -172,8 +172,8 @@ export const useStudentsStore = defineStore('students', () => {
     // Getters
     filteredStudents,
     totalStudents,
-    activeStudents,
-    inactiveStudents,
+    approvedStudents,
+    cancelledStudents,
     availableCourses,
     // Actions
     fetchStudents,
