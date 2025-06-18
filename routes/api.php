@@ -2,8 +2,8 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\AlunoController;
+use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Api\AlunoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,6 +24,6 @@ Route::middleware('auth:sanctum')->group(function () {
         return $request->user();
     });
 
-    Route::apiResource('alunos', AlunoController::class)->where(['aluno' => '[0-9]+']);
-    Route::patch('alunos/{aluno}/status', [AlunoController::class, 'updateStatus'])->where('aluno', '[0-9]+');
+    Route::apiResource('alunos', AlunoController::class);
+    Route::patch('alunos/{aluno}/status', [AlunoController::class, 'updateStatus']);
 });
