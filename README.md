@@ -2,7 +2,7 @@
 
 # Teste Técnico - Microsserviço de Gerenciamento de Alunos
 
-Este repositório contém a solução para o teste técnico de Desenvolvedor PHP Pleno, que consiste em um microsserviço back-end para gerenciamento de cadastros de alunos, construído com a versão mais recente do Laravel.
+Este repositório contém um sistema de cadastro para Alunos e Gestor, onde é trabalhado em um microsserviço back-end para gerenciamento dos alunos, cards e gestores, construído com a versão mais recente do Laravel e Vuejs.
 
 O serviço disponibiliza uma API RESTful para as operações de CRUD de alunos, incluindo regras de negócio específicas, autenticação baseada em tokens JWT e controle de acesso por perfil.
 
